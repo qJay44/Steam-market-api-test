@@ -1,32 +1,31 @@
 import tkinter as tk
 
 class SteamItem:
-    testURL = 'https://steamcommunity.com/market/listings/730/Antwerp%202022%20Champions%20Autograph%20Capsule'
     _items = {}
     __id = 0
 
-    def __init__(self):
+    def __init__(self, testURL = None):
         frameSteamItem = tk.Frame(highlightbackground='#5d5f60', highlightthickness=2)
 
         labelURL = tk.Label(master=frameSteamItem, text='url', font=('Arial 14'))
         labelURL.pack(side=tk.LEFT)
 
         entryURL = tk.Entry(master=frameSteamItem, width=60)
-        entryURL.insert(0, SteamItem.testURL)
         entryURL.pack(side=tk.LEFT, padx=10)
         entryURL.focus()
         entryURL.bind('<FocusIn>', lambda e: e.widget.select_range(0, tk.END))
+        entryURL.insert(0, testURL) if testURL is not None else ...
 
-        self.__id = SteamItem.__id
+        id = SteamItem.__id
 
         btnDeleteItem = tk.Button(
             master=frameSteamItem,
             text='x',
             font=('Arial', 14),
-            command=lambda: self.__deleteSteamItem(self.__id)
+            command=lambda: self.__deleteSteamItem(id)
         )
         btnDeleteItem.pack(side=tk.RIGHT, padx=5, pady=5)
-        frameSteamItem.pack(padx=10, pady=10)
+        frameSteamItem.pack(fill=tk.X, padx=10, pady=10)
 
         self.__addNewSteamItem(frameSteamItem, entryURL)
 

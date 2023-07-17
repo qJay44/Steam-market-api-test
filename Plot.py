@@ -1,28 +1,29 @@
 import requests
 import matplotlib.pyplot as plt
 import pandas as pd
-from config import COOKIES
 
 
 class Plot:
-    __ax = None
 
-    @classmethod
-    def showPlot(cls, items):
-        fig, cls.__ax = plt.subplots(figsize=(15, 7))
-        cls.__ax.grid(True)
-        cls.__ax.set_xlabel('Date', size=14)
-        cls.__ax.set_ylabel('Price (руб.)', labelpad=20, size=14)
+    def __init__(self, items, cookie):
+        self.items = items
+        self.cookie = cookie
 
-        for _, item in items.items():
-            appId, name = cls.__parseURL(item['entryURL'].get())
-            cls.__sendRequest(appId, name)
+    def showPlot(self):
+        _, self.__ax = plt.subplots(figsize=(15, 7))
+        self.__ax.grid(True)
+        self.__ax.set_xlabel('Date', size=14)
+        self.__ax.set_ylabel('Price (руб.)', labelpad=20, size=14)
 
-        fig.legend(loc='outside upper left')
+        for _, item in self.items.items():
+            appId, name = self.__parseURL(item['entryURL'].get())
+            self.__sendRequest(appId, name)
+
+        # TODO: fix legend position
+        self.__ax.legend()
         plt.show()
 
-    @classmethod
-    def __buildPlot(cls, data, name):
+    def __buildPlot(self, data, name):
         if data['success']:
             xAxis = []
             yAxis = []
@@ -41,12 +42,12 @@ class Plot:
             df['value'] = yAxis
             df = df.set_index(date)
 
-            cls.__ax.plot(df, label=name)
+            self.__ax.plot(df, label=name)
+            # cls.__ax.scatter(df.index, df.value, s=3, label=name)
         else:
             print("Response was unsuccessful")
 
-    @classmethod
-    def __sendRequest(cls, appid, name):
+    def __sendRequest(self, appid, name):
         params = {
             'country': 'RU',
             'currency': 5,
@@ -57,12 +58,12 @@ class Plot:
         response = requests.get(
             'http://steamcommunity.com/market/pricehistory',
             params=params,
-            cookies=COOKIES
+            cookies={ 'steamLoginSecure': self.cookie }
         )
 
         data = response.json()
 
-        cls.__buildPlot(data, name)
+        self.__buildPlot(data, name)
 
     @staticmethod
     def __parseURL(url):
